@@ -1,13 +1,20 @@
 #!/usr/bin/env node
 // cli.mjs
 // 以 OpenAI Agents + MCP(Stdio) 直連本機 chrome-devtools-mcp。
-// 會自動打開 Chrome（非 headless），到 YouTube 搜尋「廣告金曲」並播放一首輕鬆愉快的歌。
+// 提供通用的 AI 助手功能，並在需要時可以操作 Chrome 瀏覽器。
 // 對話狀態(state)保存在記憶體中，於同一行程可延續。
 
-import { Agent, run, MCPServerStdio } from '@openai/agents';
+import { run } from '@openai/agents';
 import { createInterface } from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
 import dotenv from 'dotenv';
+import { 
+  createAgent, 
+  createMCPServer, 
+  saveState, 
+  loadState, 
+  closeMCPServer 
+} from './cli-agent.mjs';
 
 // 載入 .env 檔案
 dotenv.config();
@@ -18,62 +25,43 @@ if (!process.env.OPENAI_API_KEY) {
   process.exit(1);
 }
 
-const mcpServer = new MCPServerStdio({
-  name: 'chrome-devtools',
-  // 直接用 npx 啟動 chrome-devtools-mcp（首次呼叫工具時會拉起 Chrome）
-  // 可在這裡加 flags：例如 '--headless'、'--viewport=1280x720'
-  fullCommand: 'npx -y chrome-devtools-mcp@latest',
-  cacheToolsList: true,
-});
-
-await mcpServer.connect();
-
-const instructions = `
-You are a browser automation agent controlling Chrome via the "chrome-devtools" MCP server.
-Goal: Open YouTube, search for "廣告金曲", pick a light/upbeat song, and start playback.
-
-Guidelines:
-- Navigate to https://www.youtube.com using "navigate_page".
-- Wait for key selectors (e.g., search box 'input#search') using "wait_for".
-- Enter the query "廣告金曲" with "fill" and trigger search (e.g., press Enter or click 'button#search-icon-legacy').
-- From the results, choose a video whose title/metadata suggests a light/cheerful mood (e.g., “輕鬆”, “快樂”, "愉快").
-- Click the title/thumbnail to open the video page and ensure playback begins.
-- If a cookie/consent dialog appears, accept and continue.
-- If pre-roll ads appear, just ensure main playback will start; do not try to skip.
-- Finally, summarize what you did and which video title you played.
-`;
-
-const agent = new Agent({
-  name: 'Chrome Player',
-  model: 'gpt-5-mini',
-  instructions,
-  mcpServers: [mcpServer],
-});
+// 初始化
+console.log('🚀 正在啟動 AI 助手...');
+await createMCPServer();
+const agent = await createAgent();
+console.log('✓ Agent 初始化完成');
+console.log('✓ Chrome DevTools MCP 已連接\n');
 
 // 記憶體內對話狀態
-let state;
+let state = await loadState();
+if (state) {
+  console.log('✓ 已載入先前的對話狀態\n');
+}
 
-const argvText = process.argv.slice(2).join(' ').trim();
-const firstTask = argvText || '前往 YouTube 搜尋「廣告金曲」，選一首輕鬆愉快的歌並播放。';
-
-let result = await run(agent, firstTask);
-state = result.state;
-console.log('\n=== Agent Output ===\n' + result.finalOutput + '\n');
+// 顯示歡迎訊息
+console.log('💬 AI 助手已就緒！');
+console.log('   - 可以進行一般對話');
+console.log('   - 需要時會自動使用瀏覽器操作');
+console.log('   - 輸入空白行結束程式\n');
 
 // 簡單 REPL：沿用同一個 state 繼續指令
 const rl = createInterface({ input, output });
 function ask() {
-  rl.question('> 下一個指令（直接 Enter 結束）：', async (line) => {
+  rl.question('> 你的訊息（直接 Enter 結束）：', async (line) => {
     const text = line.trim();
     if (!text) {
       rl.close();
-      await mcpServer.close();
+      await closeMCPServer();
       process.exit(0);
       return;
     }
     try {
-      result = await run(agent, text, { state });
+      const result = await run(agent, text, { state });
       state = result.state;
+      const saved = await saveState(state);
+      if (saved) {
+        console.log('✓ 狀態已保存');
+      }
       console.log('\n=== Agent Output ===\n' + result.finalOutput + '\n');
     } catch (err) {
       console.error('Error:', err?.message || err);

@@ -1,12 +1,19 @@
 {
   "name": "poc-mcp-youtube",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "type": "module",
   "private": true,
+  "scripts": {
+    "cli": "node cli.mjs",
+    "web": "node web/server.mjs",
+    "start": "node web/server.mjs"
+  },
   "dependencies": {
     "@openai/agents": "^0.1.7",
     "cross-fetch": "^4.1.0",
     "dotenv": "^17.2.3",
-    "openai": "^6.0.0"
+    "express": "^5.1.0",
+    "openai": "^6.0.0",
+    "ws": "^8.18.3"
   }
 }
