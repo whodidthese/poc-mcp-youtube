@@ -72,8 +72,7 @@ function ask() {
       return;
     }
     try {
-      const followup = state.forkWithUserInput(text);
-      result = await run(agent, followup);
+      result = await run(agent, text, { state });
       state = result.state;
       console.log('\n=== Agent Output ===\n' + result.finalOutput + '\n');
     } catch (err) {
