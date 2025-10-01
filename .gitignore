@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+
+# Log files
+**/*logs/*
+*_log.txt
+*_log.json
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.sample
+# .vscode
+
+# Project
+

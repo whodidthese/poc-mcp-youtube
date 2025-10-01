@@ -1,0 +1,12 @@
+{
+  "name": "poc-mcp-youtube",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@openai/agents": "^0.1.7",
+    "cross-fetch": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "openai": "^6.0.0"
+  }
+}
