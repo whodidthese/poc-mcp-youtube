@@ -57,97 +57,97 @@ let agentInstance = null;
  * 建立並連接 MCP 伺服器
  */
 export async function createMCPServer() {
-  if (mcpServerInstance) {
-    return mcpServerInstance;
-  }
+	if (mcpServerInstance) {
+		return mcpServerInstance;
+	}
 
-  mcpServerInstance = new MCPServerStdio({
-    name: 'chrome-devtools',
-    fullCommand: 'npx -y chrome-devtools-mcp@latest --lang=zh-TW',
-    cacheToolsList: true,
-  });
+	mcpServerInstance = new MCPServerStdio({
+		name: 'chrome-devtools',
+		fullCommand: 'npx -y chrome-devtools-mcp@latest --lang=zh-TW',
+		cacheToolsList: true,
+	});
 
-  await mcpServerInstance.connect();
-  return mcpServerInstance;
+	await mcpServerInstance.connect();
+	return mcpServerInstance;
 }
 
 /**
  * 建立 Agent
  */
 export async function createAgent() {
-  if (agentInstance) {
-    return agentInstance;
-  }
+	if (agentInstance) {
+		return agentInstance;
+	}
 
-  const mcpServer = await createMCPServer();
+	const mcpServer = await createMCPServer();
 
-  agentInstance = new Agent({
-    name: 'Chrome Player',
-    model: 'gpt-5-mini',
-    instructions,
-    mcpServers: [mcpServer],
-    maxTurns: MAX_TURNS,
-  });
+	agentInstance = new Agent({
+		name: 'Chrome Player',
+		model: 'gpt-5-mini',
+		instructions,
+		mcpServers: [mcpServer],
+		maxTurns: MAX_TURNS,
+	});
 
-  return agentInstance;
+	return agentInstance;
 }
 
 /**
  * 保存狀態到檔案
  */
 export async function saveState(state) {
-  try {
-    if (!existsSync('./storage')) {
-      await mkdir('./storage', { recursive: true });
-    }
-    const data = {
-      schemaVersion: SCHEMA_VERSION,
-      timestamp: new Date().toISOString(),
-      state: state
-    };
-    // 先寫臨時檔，完成後替換（防止損毀）
-    const tmpFile = STATE_FILE + '.tmp';
-    await writeFile(tmpFile, JSON.stringify(data, null, 2));
-    await writeFile(STATE_FILE, JSON.stringify(data, null, 2));
-    return true;
-  } catch (err) {
-    console.error('× 保存狀態失敗:', err?.message);
-    return false;
-  }
+	try {
+		if (!existsSync('./storage')) {
+			await mkdir('./storage', { recursive: true });
+		}
+		const data = {
+			schemaVersion: SCHEMA_VERSION,
+			timestamp: new Date().toISOString(),
+			state: state
+		};
+		// 先寫臨時檔，完成後替換（防止損毀）
+		const tmpFile = STATE_FILE + '.tmp';
+		await writeFile(tmpFile, JSON.stringify(data, null, 2));
+		await writeFile(STATE_FILE, JSON.stringify(data, null, 2));
+		return true;
+	} catch (err) {
+		console.error('× 保存狀態失敗:', err?.message);
+		return false;
+	}
 }
 
 /**
  * 從檔案載入狀態
  */
 export async function loadState() {
-  try {
-    if (!existsSync(STATE_FILE)) {
-      return null;
-    }
-    const raw = await readFile(STATE_FILE, 'utf-8');
-    const data = JSON.parse(raw);
-    
-    // 檢查版本相容性
-    if (data.schemaVersion !== SCHEMA_VERSION) {
-      console.log(`⚠ 狀態檔版本不符（${data.schemaVersion} vs ${SCHEMA_VERSION}），將忽略`);
-      return null;
-    }
-    
-    return data.state;
-  } catch (err) {
-    console.error('× 載入狀態失敗:', err?.message);
-    return null;
-  }
+	try {
+		if (!existsSync(STATE_FILE)) {
+			return null;
+		}
+		const raw = await readFile(STATE_FILE, 'utf-8');
+		const data = JSON.parse(raw);
+
+		// 檢查版本相容性
+		if (data.schemaVersion !== SCHEMA_VERSION) {
+			console.log(`⚠ 狀態檔版本不符（${data.schemaVersion} vs ${SCHEMA_VERSION}），將忽略`);
+			return null;
+		}
+
+		return data.state;
+	} catch (err) {
+		console.error('× 載入狀態失敗:', err?.message);
+		return null;
+	}
 }
 
 /**
  * 關閉 MCP 伺服器
  */
 export async function closeMCPServer() {
-  if (mcpServerInstance) {
-    await mcpServerInstance.close();
-    mcpServerInstance = null;
-    agentInstance = null;
-  }
+	if (mcpServerInstance) {
+		await mcpServerInstance.close();
+		mcpServerInstance = null;
+		agentInstance = null;
+	}
 }
 

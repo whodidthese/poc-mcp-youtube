@@ -8,12 +8,12 @@ import { run } from '@openai/agents';
 import { createInterface } from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
 import dotenv from 'dotenv';
-import { 
-  createAgent, 
-  createMCPServer, 
-  saveState, 
-  loadState, 
-  closeMCPServer 
+import {
+	createAgent,
+	createMCPServer,
+	saveState,
+	loadState,
+	closeMCPServer
 } from './cli-agent.mjs';
 
 // 載入 .env 檔案
@@ -21,8 +21,8 @@ dotenv.config();
 
 // 檢查 OPENAI_API_KEY 是否存在
 if (!process.env.OPENAI_API_KEY) {
-  console.error('錯誤：未設定 OPENAI_API_KEY，請在 .env 檔案中設定');
-  process.exit(1);
+	console.error('錯誤：未設定 OPENAI_API_KEY，請在 .env 檔案中設定');
+	process.exit(1);
 }
 
 // 初始化
@@ -35,7 +35,7 @@ console.log('✓ Chrome DevTools MCP 已連接\n');
 // 記憶體內對話狀態
 let state = await loadState();
 if (state) {
-  console.log('✓ 已載入先前的對話狀態\n');
+	console.log('✓ 已載入先前的對話狀態\n');
 }
 
 // 顯示歡迎訊息
@@ -47,26 +47,26 @@ console.log('   - 輸入空白行結束程式\n');
 // 簡單 REPL：沿用同一個 state 繼續指令
 const rl = createInterface({ input, output });
 function ask() {
-  rl.question('> 你的訊息（直接 Enter 結束）：', async (line) => {
-    const text = line.trim();
-    if (!text) {
-      rl.close();
-      await closeMCPServer();
-      process.exit(0);
-      return;
-    }
-    try {
-      const result = await run(agent, text, { state });
-      state = result.state;
-      const saved = await saveState(state);
-      if (saved) {
-        console.log('✓ 狀態已保存');
-      }
-      console.log('\n=== Agent Output ===\n' + result.finalOutput + '\n');
-    } catch (err) {
-      console.error('Error:', err?.message || err);
-    }
-    ask();
-  });
+	rl.question('> 你的訊息（直接 Enter 結束）：', async (line) => {
+		const text = line.trim();
+		if (!text) {
+			rl.close();
+			await closeMCPServer();
+			process.exit(0);
+			return;
+		}
+		try {
+			const result = await run(agent, text, { state });
+			state = result.state;
+			const saved = await saveState(state);
+			if (saved) {
+				console.log('✓ 狀態已保存');
+			}
+			console.log('\n=== Agent Output ===\n' + result.finalOutput + '\n');
+		} catch (err) {
+			console.error('Error:', err?.message || err);
+		}
+		ask();
+	});
 }
 ask();
