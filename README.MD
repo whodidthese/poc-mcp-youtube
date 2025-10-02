@@ -2,37 +2,15 @@
 
 結合 OpenAI Agents 與 Chrome DevTools MCP 的通用 AI 助手，可以進行一般對話，並在需要時自動操作 Chrome 瀏覽器。
 
-## 快速開始
-
-### 1. 設定環境
-
-複製 `.env.sample` 為 `.env` 並設定你的 API Key：
+## 快速開始（極簡）
 
 ```bash
 cp .env.sample .env
-# 編輯 .env 填入 OPENAI_API_KEY
-```
-
-### 2. 安裝相依套件
-
-```bash
 npm install
+npm run cli # 或 npm run web
 ```
 
-### 3. 執行方式
-
-**CLI 模式**（命令列互動）：
-```bash
-npm run cli
-# 或: node cli.mjs
-```
-
-**Web 模式**（瀏覽器控制台）：
-```bash
-npm run web
-# 或: npm start
-# 開啟瀏覽器前往 http://localhost:3000
-```
+完整安裝、設定與操作說明請見 `USAGE.md`。
 
 ## 功能特色
 
@@ -44,15 +22,35 @@ npm run web
 - ✅ **Web 控制台**：美觀的圖形化介面，即時日誌顯示
 - ✅ **可調整參數**：透過 `.env` 設定 MAX_TURNS（預設 25）
 
-## 設定說明
+## 架構圖
 
-在 `.env` 檔案中可設定：
-
-```env
-OPENAI_API_KEY=your_api_key_here
-MAX_TURNS=25          # Agent 最大執行回合數（預設 25）
-PORT=3000            # Web 伺服器埠號（預設 3000）
 ```
+            ┌───────────────────────────────┐
+            │          使用者（你）          │
+            └──────────────┬────────────────┘
+                           │
+      ┌──────────────┐    │     ┌─────────────────────┐
+      │     CLI      │────┴────▶│   Web UI (Express)  │
+      └──────────────┘  WebSocket└─────────────────────┘
+               \             /
+                \           /
+                 ▼         ▼
+             ┌──────────────────────┐
+             │  Agent (OpenAI SDK)  │
+             └───────────┬──────────┘
+                         │
+      ┌──────────────────▼──────────────────┐
+      │   Chrome DevTools MCP ↔ Chrome      │
+      └──────────────────┬──────────────────┘
+                         │
+               ┌─────────▼─────────┐
+               │ storage/state.json │
+               └────────────────────┘
+```
+
+## 設定與使用
+
+安裝、環境變數與執行方式請見 `USAGE.md`。
 
 ## 專案結構
 
@@ -68,10 +66,18 @@ PORT=3000            # Web 伺服器埠號（預設 3000）
 └── .env                 # 環境變數設定
 ```
 
-## Reference
+## 設計與實作重點
 
- - https://modelcontextprotocol.io/docs/getting-started/intro
- - https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md
+- **語系與地區策略**：預設 `zh-TW`，YouTube 搜尋附加 `hl=zh-TW&gl=TW`；必要時以指令提示偏好繁中/台灣。
+- **持久記憶**：啟動載入 `storage/state.json`、每次執行後保存；含 `schemaVersion` 與臨時檔寫入以降低損毀風險。
+- **錯誤復原**：多組 selector、重試與降級 URL，關鍵訊息回推前端。
+- **登入策略（選用）**：建議使用持久化 Chrome 使用者資料夾以避免頻繁登入；具體操作見下方 Todo。
+
+## 參考資料
+
+- https://modelcontextprotocol.io/docs/getting-started/intro
+- https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md
+- https://github.com/openai/openai-agents-sdk
 
 
 ## Todo List

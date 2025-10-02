@@ -30,13 +30,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const SERVICE_PORT = parseInt(process.env.SERVICE_PORT, 10);
+
+if(!SERVICE_PORT) {
+  console.error('--ERR SERVICE_PORT is not set!');
+  process.exit(1);
+}
 
 // 靜態檔案服務
 app.use(express.static(join(__dirname, 'public')));
 
-const server = app.listen(PORT, async () => {
-  console.log(`🚀 Web 控制台啟動於 http://localhost:${PORT}`);
+const server = app.listen(SERVICE_PORT, async () => {
+  console.log(`🚀 Web 控制台啟動於 http://localhost:${SERVICE_PORT}`);
   console.log(`📊 最大回合數: ${MAX_TURNS}`);
   console.log('⏳ 正在初始化 Agent...');
   
