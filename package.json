@@ -6,7 +6,8 @@
   "scripts": {
     "cli": "node cli.mjs",
     "web": "node web/server.mjs",
-    "start": "node web/server.mjs"
+    "start": "node web/server.mjs",
+    "profile": "node scripts/run.mjs"
   },
   "dependencies": {
     "@openai/agents": "^0.1.7",

@@ -63,7 +63,8 @@ export async function createMCPServer() {
 
 	mcpServerInstance = new MCPServerStdio({
 		name: 'chrome-devtools',
-		fullCommand: 'npx -y chrome-devtools-mcp@latest --lang=zh-TW',
+		// fullCommand: 'npx -y chrome-devtools-mcp@latest --lang=zh-TW',
+		fullCommand: 'npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222 --lang=zh-TW',
 		cacheToolsList: true,
 	});
 
