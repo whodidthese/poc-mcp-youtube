@@ -1,7 +1,5 @@
 # 使用指南
 
-（若要了解專案「概念、架構與設計」，請見 `README.MD`）
-
 ## 快速開始
 
 ### 1️⃣ 環境設定
@@ -238,15 +236,7 @@ rm storage/state.json.tmp
 npm run cli  # 或 npm run web
 ```
 
-> 專案結構與設計說明請見 `README.MD`。
-
-> 技術堆疊請見 `README.MD`。
-
-> 開發建議與 Roadmap 請見 `README.MD`。
-
-> 延伸閱讀與參考資料請見 `README.MD`。
-
 ---
 
-返回：`README.MD`（了解架構、設計與參考資料）
+返回：`README.MD`（專案結構、設計說明、技術堆疊、開發建議、Roadmap、延伸閱讀參考資料）
 
