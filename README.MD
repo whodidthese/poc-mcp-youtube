@@ -10,7 +10,7 @@ npm install
 npm run cli # 或 npm run web
 ```
 
-完整安裝、設定與操作說明請見 `USAGE.md`。
+完整安裝、設定與操作說明請見 [USAGE.md](docs/USAGE.md)。
 
 ## 功能特色
 
@@ -21,10 +21,6 @@ npm run cli # 或 npm run web
 - ✅ **繁中優化**：預設使用繁體中文回應，網頁操作偏好台灣地區
 - ✅ **Web 控制台**：美觀的圖形化介面，即時日誌顯示
 - ✅ **可調整參數**：透過 `.env` 設定 MAX_TURNS（預設 25）
-
-## 設定與使用
-
-安裝、環境變數與執行方式請見 `USAGE.md`。
 
 ## 專案結構
 
